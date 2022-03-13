@@ -1,19 +1,24 @@
 const puppeteer = require("puppeteer");
-const cheerio = require("cheerio");
 
 (async () => {
   const browser = await puppeteer.launch({
     headless: false,
   });
   const page = await browser.newPage();
-  await page.setViewport({
-    width: 1440,
-    height: 1080,
-  });
+  await page.goto(
+    "https://emart.ssg.com/category/listCategoryItem.ssg?dispCtgId=6000097431"
+  );
 
-  await page.goto("https://www.tistory.com/category/life");
-  const html = await page.content();
-  const $ = cheerio.load(html);
-  const hi = $("#mArticle").text();
-  console.log(hi);
+  const data = await page.evaluate(() => {
+    const list = [];
+    const items = document.querySelectorAll("cunit_thmb_lst > cunit_t232");
+
+    for (const item of items) {
+      list.push({
+        title: item.querySelector(".cunit_md title").innerHTML,
+      });
+    }
+    return list;
+  });
+  console.log(data);
 })();

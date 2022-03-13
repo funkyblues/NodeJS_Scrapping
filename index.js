@@ -1,13 +1,25 @@
 const axios = require("axios");
-const cheerio = require("cheerio");
 
-axios
-  .get(
-    "https://www.tistory.com/category/getMoreCategoryPost.json?category=life&lastPublished=0&first=true"
-  )
-  .then((response) => {
-    const htmlString = response.data;
-    // const $ = cheerio.load(htmlString);
-    // const href = $("a").attr("href");
-    console.dir(htmlString.data.list);
-  });
+let article = {};
+const crawler = (pageNumber) => {
+  axios
+    .get(
+      `https://api.brunch.co.kr/v1/search/article?q=Hello&page=${pageNumber}&pageSize=20&highlighter=y&escape=y&sortBy=accu`
+    )
+    .then((response) => {
+      const data = response.data;
+      article[pageNumber] = data.data.list;
+
+      console.log("current page number: ", pageNumber);
+      // console.log(data.data.list[0]);
+      const nextNumber = pageNumber + 1;
+      if (pageNumber < 10) {
+        crawler(nextNumber);
+        return;
+      }
+
+      console.log(article);
+    });
+};
+
+crawler(1);
